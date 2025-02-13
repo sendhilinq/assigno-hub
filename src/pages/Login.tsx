@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +25,14 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
+    if (isAuthenticated) {
+      navigate("/tasks");
+    }
+  }, [navigate]);
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -41,7 +48,10 @@ const Login = () => {
       console.log("Login attempt with:", values);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      // Simulate successful login
+      // Set auth state
+      sessionStorage.setItem("isAuthenticated", "true");
+      
+      // Navigate and show success message
       navigate("/tasks");
       toast({
         title: "Welcome back!",
