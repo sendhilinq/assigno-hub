@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TaskCard } from "../components/TaskCard";
@@ -7,6 +8,7 @@ import { Task } from "../types/task";
 import { List, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { isAuthenticated, logout } from "@/utils/auth";
 
 const Index = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -15,23 +17,19 @@ const Index = () => {
 
   // Route protection
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
+    if (!isAuthenticated()) {
       navigate("/");
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    // Clear auth token
-    sessionStorage.removeItem("token");
+    logout();
     
-    // Show success message
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account.",
     });
     
-    // Redirect to login
     navigate("/");
   };
 
