@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TaskCard } from "../components/TaskCard";
@@ -14,18 +13,17 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Simple route protection
+  // Route protection
   useEffect(() => {
-    // You might want to add proper auth check here
-    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
-    if (!isAuthenticated) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
       navigate("/");
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    // Clear auth state
-    sessionStorage.removeItem("isAuthenticated");
+    // Clear auth token
+    sessionStorage.removeItem("token");
     
     // Show success message
     toast({

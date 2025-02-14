@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,8 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+const API_URL = "http://localhost:3000"; // Your Express backend URL
+
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -27,8 +30,8 @@ const Login = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
-    if (isAuthenticated) {
+    const token = sessionStorage.getItem("token");
+    if (token) {
       navigate("/tasks");
     }
   }, [navigate]);
@@ -44,12 +47,22 @@ const Login = () => {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
-      // For now, we'll just simulate a login
-      console.log("Login attempt with:", values);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Set auth state
-      sessionStorage.setItem("isAuthenticated", "true");
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store the token
+      sessionStorage.setItem("token", data.token);
       
       // Navigate and show success message
       navigate("/tasks");
@@ -61,7 +74,7 @@ const Login = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Invalid email or password.",
+        description: error instanceof Error ? error.message : "Invalid email or password.",
       });
     } finally {
       setIsLoading(false);
