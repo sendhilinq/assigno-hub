@@ -1,9 +1,11 @@
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -27,6 +29,7 @@ const API_URL = "http://localhost:3000";
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -74,11 +77,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email address</FormLabel>
+              <FormLabel className="text-base font-normal">
+                Email Address <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="Enter the email"
+                  className="bg-[#f5f8fa]"
                   {...field}
                 />
               </FormControl>
@@ -92,21 +98,48 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel className="text-base font-normal">
+                Password <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  {...field}
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter the Password"
+                    className="bg-[#f5f8fa] pr-20"
+                    {...field}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#006666] text-sm font-medium"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </FormControl>
+              <div className="flex justify-end">
+                <a
+                  href="#"
+                  className="text-[#006666] text-sm hover:underline mt-2"
+                >
+                  Forgot password?
+                </a>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Sign in
+        <Button 
+          type="submit" 
+          className="w-full bg-[#006666] hover:bg-[#005555] text-white"
+        >
+          Sign In
         </Button>
       </form>
     </Form>
